@@ -1,23 +1,28 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Player_Move : MonoBehaviour
 {
-    public float hforce, vforce, hSpeed, vSpeed,hBoost,camSpeed;
+    public float hforce, vforce, hSpeed, vSpeed, hBoost, camSpeed, shiftBoost;
    // public bool isOnGround;
     Rigidbody2D rb;
     public Camera Cam;
-    public int minYValue;
+    public int minYValue ;
     BoxCollider2D Cdrd;
-    public bool isGrounded;
+    public bool isGrounded,vShift;
     public Transform SpawnPoint;
     [SerializeField]
     private LayerMask LayerSolidGroundMask;
 
     float smoothX, smoothY, smoothZ,smoothEndZ;
+
+
     void Start()
     {
+        
         rb = transform.GetComponent<Rigidbody2D>();
         Cdrd = transform.GetComponent<BoxCollider2D>();
         smoothEndZ = Cam.transform.position.z;
@@ -32,19 +37,20 @@ public class Player_Move : MonoBehaviour
 
     void FixedUpdate()
     {
+        if (Input.GetKey(KeyCode.LeftShift)) vShift = true;
+        else vShift = false;
 
-        if (transform.position.y < minYValue) transform.position = new Vector3(SpawnPoint.transform.position.x,SpawnPoint.transform.position.y,transform.position.z);
+            if (transform.position.y < minYValue) transform.position = new Vector3(SpawnPoint.transform.position.x, SpawnPoint.transform.position.y, transform.position.z);
         
         if (isOnGround()) isGrounded = true; else isGrounded = false;
 
-
         if (Input.GetKey(KeyCode.RightArrow))
         {
-            if (!isWallAround(Vector2.right)) rb.velocity = new Vector2(hforce,rb.velocity.y);
+            if ((!isWallAround(Vector2.right) || isOnGround()) && !Input.GetKey(KeyCode.LeftArrow)) rb.velocity = new Vector2(hforce + shiftBoost * Convert.ToInt32(vShift), rb.velocity.y);
         }
         else if (Input.GetKey(KeyCode.LeftArrow))
         {
-            if (!isWallAround(Vector2.left))  rb.velocity = new Vector2(-hforce, rb.velocity.y);
+            if ((!isWallAround(Vector2.left) || isOnGround()) && !Input.GetKey(KeyCode.RightArrow)) rb.velocity = new Vector2(-(hforce + shiftBoost * Convert.ToInt32(vShift)), rb.velocity.y);
         }
         else
         {
@@ -86,9 +92,9 @@ public class Player_Move : MonoBehaviour
 
     public bool isWallAround(Vector2 vec2)
     {
-        float rayMaxLenght = .05f;
-        RaycastHit2D rchup = Physics2D.Raycast(new Vector2(Cdrd.bounds.center.x, Cdrd.bounds.max.y), vec2, Cdrd.bounds.extents.x + rayMaxLenght, LayerSolidGroundMask);
-        RaycastHit2D rchdown = Physics2D.Raycast(new Vector2(Cdrd.bounds.center.x, Cdrd.bounds.min.y), vec2, Cdrd.bounds.extents.x + rayMaxLenght, LayerSolidGroundMask);
+        float rayMaxLenght = .02f;
+        RaycastHit2D rchup = Physics2D.Raycast(new Vector2(Cdrd.bounds.center.x, Cdrd.bounds.max.y + rayMaxLenght), vec2, Cdrd.bounds.extents.x + rayMaxLenght, LayerSolidGroundMask);
+        RaycastHit2D rchdown = Physics2D.Raycast(new Vector2(Cdrd.bounds.center.x, Cdrd.bounds.min.y - rayMaxLenght), vec2, Cdrd.bounds.extents.x + rayMaxLenght, LayerSolidGroundMask);
 
         if (rchup.collider != null)
             Debug.DrawRay(new Vector3(Cdrd.bounds.center.x, Cdrd.bounds.max.y, transform.position.z), vec2 * (Cdrd.bounds.extents.x + rayMaxLenght), Color.green);

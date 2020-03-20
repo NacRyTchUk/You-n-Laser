@@ -38,10 +38,11 @@ public class Player_Animation : MonoBehaviour {
         }
         else
             anim.SetBool("isOnGround", false);
-        
 
-        
-        
+
+
+        if (pm.vShift) anim.SetBool("isRunning", true);
+        else anim.SetBool("isRunning", false); 
 
        
         
