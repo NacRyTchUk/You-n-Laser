@@ -6,18 +6,21 @@ using UnityEngine.UI;
 
 public class Player_Move : MonoBehaviour
 {
-    public float hforce, vforce, hSpeed, vSpeed, hBoost, camSpeed, shiftBoost;
-   // public bool isOnGround;
-    Rigidbody2D rb;
-    public Camera Cam;
-    public int minYValue ;
-    BoxCollider2D Cdrd;
-    public bool isGrounded,vShift;
-    public Transform SpawnPoint;
+    public float hforce, vforce, camSpeed, shiftBoost, vBoost;
+    public int minYValue;
+    public bool isGrounded, vShift;
+    
     [SerializeField]
-    private LayerMask LayerSolidGroundMask;
+    Camera Cam;
+    [SerializeField]
+    Transform SpawnPoint;
+    [SerializeField]
+    LayerMask LayerSolidGroundMask;
 
     float smoothX, smoothY, smoothZ,smoothEndZ;
+    Rigidbody2D rb;
+    BoxCollider2D Cdrd;
+
 
 
     void Start()
@@ -28,6 +31,7 @@ public class Player_Move : MonoBehaviour
         smoothEndZ = Cam.transform.position.z;
     }
 
+    
 
     void Update()
     {
@@ -40,17 +44,23 @@ public class Player_Move : MonoBehaviour
         if (Input.GetKey(KeyCode.LeftShift)) vShift = true;
         else vShift = false;
 
-            if (transform.position.y < minYValue) transform.position = new Vector3(SpawnPoint.transform.position.x, SpawnPoint.transform.position.y, transform.position.z);
+        if (transform.position.y < minYValue) transform.position = new Vector3(SpawnPoint.transform.position.x, SpawnPoint.transform.position.y, transform.position.z);
         
         if (isOnGround()) isGrounded = true; else isGrounded = false;
 
+        
+
         if (Input.GetKey(KeyCode.RightArrow))
         {
-            if ((!isWallAround(Vector2.right) || isOnGround()) && !Input.GetKey(KeyCode.LeftArrow)) rb.velocity = new Vector2(hforce + shiftBoost * Convert.ToInt32(vShift), rb.velocity.y);
+            rb.transform.position = new Vector3(transform.position.x, transform.position.y + vBoost, transform.position.z);
+            if ((!isWallAround(Vector2.right) || isOnGround()) && !Input.GetKey(KeyCode.LeftArrow))
+                rb.velocity = new Vector2(hforce + shiftBoost * Convert.ToInt32(vShift), rb.velocity.y);
         }
         else if (Input.GetKey(KeyCode.LeftArrow))
         {
-            if ((!isWallAround(Vector2.left) || isOnGround()) && !Input.GetKey(KeyCode.RightArrow)) rb.velocity = new Vector2(-(hforce + shiftBoost * Convert.ToInt32(vShift)), rb.velocity.y);
+            rb.transform.position = new Vector3(transform.position.x, transform.position.y + vBoost, transform.position.z);
+            if ((!isWallAround(Vector2.left) || isOnGround()) && !Input.GetKey(KeyCode.RightArrow))
+                rb.velocity = new Vector2(-(hforce + shiftBoost * Convert.ToInt32(vShift)), rb.velocity.y);
         }
         else
         {
@@ -75,19 +85,9 @@ public class Player_Move : MonoBehaviour
         float rayMaxLenght = .05f;
         RaycastHit2D rchleft = Physics2D.Raycast(new Vector2(Cdrd.bounds.min.x, Cdrd.bounds.center.y), Vector2.down, Cdrd.bounds.extents.y + rayMaxLenght, LayerSolidGroundMask);
         RaycastHit2D rchright = Physics2D.Raycast(new Vector2(Cdrd.bounds.max.x, Cdrd.bounds.center.y), Vector2.down, Cdrd.bounds.extents.y + rayMaxLenght, LayerSolidGroundMask);
-        
-        if (rchleft.collider != null)
-            Debug.DrawRay(new Vector3(Cdrd.bounds.min.x, Cdrd.bounds.center.y, transform.position.z), Vector2.down * (Cdrd.bounds.extents.y + rayMaxLenght), Color.green);
-        else
-            Debug.DrawRay(new Vector3(Cdrd.bounds.min.x, Cdrd.bounds.center.y, transform.position.z), Vector2.down * (Cdrd.bounds.extents.y + rayMaxLenght), Color.red);
+        RaycastHit2D rchmiddle = Physics2D.Raycast(new Vector2(Cdrd.bounds.center.x, Cdrd.bounds.center.y), Vector2.down, Cdrd.bounds.extents.y + rayMaxLenght, LayerSolidGroundMask);
 
-        if (rchright.collider != null)
-            Debug.DrawRay(new Vector3(Cdrd.bounds.max.x, Cdrd.bounds.center.y, transform.position.z), Vector2.down * (Cdrd.bounds.extents.y + rayMaxLenght), Color.green);
-        else
-            Debug.DrawRay(new Vector3(Cdrd.bounds.max.x, Cdrd.bounds.center.y, transform.position.z), Vector2.down * (Cdrd.bounds.extents.y + rayMaxLenght), Color.red);
-
-        
-        return ((rchleft.collider != null) || (rchright.collider != null));
+        return ((rchleft.collider != null) || (rchright.collider != null) || (rchmiddle.collider != null));
     }
 
     public bool isWallAround(Vector2 vec2)
@@ -95,20 +95,9 @@ public class Player_Move : MonoBehaviour
         float rayMaxLenght = .02f;
         RaycastHit2D rchup = Physics2D.Raycast(new Vector2(Cdrd.bounds.center.x, Cdrd.bounds.max.y + rayMaxLenght), vec2, Cdrd.bounds.extents.x + rayMaxLenght, LayerSolidGroundMask);
         RaycastHit2D rchdown = Physics2D.Raycast(new Vector2(Cdrd.bounds.center.x, Cdrd.bounds.min.y - rayMaxLenght), vec2, Cdrd.bounds.extents.x + rayMaxLenght, LayerSolidGroundMask);
+        RaycastHit2D rchmiddle = Physics2D.Raycast(new Vector2(Cdrd.bounds.center.x, Cdrd.bounds.center.y), vec2, Cdrd.bounds.extents.x + rayMaxLenght, LayerSolidGroundMask);
 
-        if (rchup.collider != null)
-            Debug.DrawRay(new Vector3(Cdrd.bounds.center.x, Cdrd.bounds.max.y, transform.position.z), vec2 * (Cdrd.bounds.extents.x + rayMaxLenght), Color.green);
-        else
-            Debug.DrawRay(new Vector3(Cdrd.bounds.center.x, Cdrd.bounds.max.y, transform.position.z), vec2 * (Cdrd.bounds.extents.x + rayMaxLenght), Color.red);
-        
-        if (rchup.collider != null)
-            Debug.DrawRay(new Vector3(Cdrd.bounds.center.x, Cdrd.bounds.min.y, transform.position.z), vec2 * (Cdrd.bounds.extents.x + rayMaxLenght), Color.green);
-        else
-            Debug.DrawRay(new Vector3(Cdrd.bounds.center.x, Cdrd.bounds.min.y, transform.position.z), vec2 * (Cdrd.bounds.extents.x + rayMaxLenght), Color.red);
-
-
-
-        return ((rchup.collider != null) || (rchdown.collider != null));
+        return ((rchup.collider != null) || (rchdown.collider != null) || (rchmiddle.collider != null));
     }
  
 }

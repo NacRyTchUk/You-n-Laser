@@ -21,11 +21,7 @@ public class Player_Animation : MonoBehaviour {
 		 else 
             anim.SetBool("isWalk", false);
 
-        if (Mathf.Abs(pm.hSpeed) > pm.hforce / 2)
-            anim.SetBool("isRunning", true);
-        else
-            anim.SetBool("isRunning", false);
-
+       
         if (pm.isOnGround())
         {
             anim.SetBool("isOnGround", true);
