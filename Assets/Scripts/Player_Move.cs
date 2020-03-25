@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+
 public class Player_Move : MonoBehaviour
 {
     public float hforce, vforce, camSpeed, shiftBoost, vBoost;
@@ -16,16 +17,14 @@ public class Player_Move : MonoBehaviour
     Transform SpawnPoint;
     [SerializeField]
     LayerMask LayerSolidGroundMask;
-
+    
     float smoothX, smoothY, smoothZ,smoothEndZ;
     Rigidbody2D rb;
     BoxCollider2D Cdrd;
 
-
-
+    
     void Start()
     {
-        
         rb = transform.GetComponent<Rigidbody2D>();
         Cdrd = transform.GetComponent<BoxCollider2D>();
         smoothEndZ = Cam.transform.position.z;
