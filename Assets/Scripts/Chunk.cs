@@ -74,6 +74,8 @@ public class Chunk
             newGameObject = MonoBehaviour.Instantiate((GameObject)Resources.Load("BlocksPrefabs/" + Convert.ToString(listOfBlocks[i].blockIndex)), chunkObject.transform);
             newGameObject.name = "[" + listOfBlocks[i].blockIndex + ";" + listOfBlocks[i].x + ";" + listOfBlocks[i].y + ";" + listOfBlocks[i].mainLayer + "]";
             newGameObject.transform.position = new Vector3(listOfBlocks[i].x * 0.5f, listOfBlocks[i].y * 0.5f, listOfBlocks[i].mainLayer * 0.5f);
+            if (listOfBlocks[i].mainLayer == 0)
+                newGameObject.AddComponent<BoxCollider2D>();
         }
     }
 
