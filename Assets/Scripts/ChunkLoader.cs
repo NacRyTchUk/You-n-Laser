@@ -6,16 +6,14 @@ using System.IO;
 
 public class ChunkLoader : MonoBehaviour {
     public GameObject parentsOfChunks;
-    Chunk curChunk = new Chunk();
+    private readonly Chunk _curChunk = new Chunk();
 
-    void Start () {
+    private void Start () {
         
-        curChunk.SetCoord(0,0);
+        _curChunk.SetCoords(0,0);
 
-        curChunk.Load(parentsOfChunks);
+        _curChunk.Load(parentsOfChunks);
        
 	}
 	
-	void Update () {
-	}
 }

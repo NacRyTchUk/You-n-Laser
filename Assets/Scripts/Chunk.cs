@@ -4,9 +4,10 @@ using System.IO;
 using System;
 using UnityEngine;
 using UnityEngine.UI;
+using Object = UnityEngine.Object;
 
 
-struct block
+internal struct Block
 {
     public float x;
     public float y;
@@ -16,72 +17,71 @@ struct block
 
 public class Chunk
 {
-    Vector2 CoordOfTheChunk;
+    private Vector2 _coordsOfTheChunk;
 
-    List<block> listOfBlocks = new List<block>();
+    private readonly List<Block> _listOfBlocks = new List<Block>();
 
-    GameObject parentOfChunk, chunkObject;
+    private GameObject _parentOfChunk, _chunkObject;
 
-    public void SetCoord(int x, int y)
+    public void SetCoords(int x, int y)
     {
-        CoordOfTheChunk.x = x;
-        CoordOfTheChunk.y = y;
+        _coordsOfTheChunk.x = x;
+        _coordsOfTheChunk.y = y;
     }
 
-    public void SetCoord(Vector2 COORD)
+    public void SetCoords(Vector2 coords)
     {
-        CoordOfTheChunk = COORD;
+        _coordsOfTheChunk = coords;
     }
 
 
     public void DisplayInfo()
     {
-        Debug.Log("Chunk x: " + CoordOfTheChunk.x + ", y: " + CoordOfTheChunk.y);
+        Debug.Log("Chunk x: " + _coordsOfTheChunk.x + ", y: " + _coordsOfTheChunk.y);
     }
 
 
-    public void LoadInMemory()
+    private void LoadInMemory()
     {
-        TextAsset txtAsset = (TextAsset)Resources.Load("Map\\" + CoordOfTheChunk.x + "," + CoordOfTheChunk.y, typeof(TextAsset));
-        string[] pageOfFile = txtAsset.text.Split('$');
+        TextAsset txtAsset = (TextAsset)Resources.Load("Map\\" + _coordsOfTheChunk.x + "," + _coordsOfTheChunk.y, typeof(TextAsset));
+        var pageOfFile = txtAsset.text.Split('$');
 
-        string[] bricksInFile = pageOfFile[0].Split(':');
+        var bricksInFile = pageOfFile[0].Split(':');
 
-        block NewBlock;
         for (int i = 0; i < bricksInFile.Length; i++)
         {
             bricksInFile[i] = bricksInFile[i].Trim('[');
             bricksInFile[i] = bricksInFile[i].Trim(']');
-            string[] elementsInBrick = bricksInFile[i].Split(';');
-            NewBlock.blockIndex = Convert.ToInt32(elementsInBrick[0]);
-            NewBlock.x = Convert.ToSingle(elementsInBrick[1]);
-            NewBlock.y = Convert.ToSingle(elementsInBrick[2]);
-            NewBlock.mainLayer = Convert.ToInt32(elementsInBrick[3]);
-            listOfBlocks.Add(NewBlock);
+            var elementsInBrick = bricksInFile[i].Split(';');
+            Block newBlock;
+            newBlock.blockIndex = Convert.ToInt32(elementsInBrick[0]);
+            newBlock.x = Convert.ToSingle(elementsInBrick[1]);
+            newBlock.y = Convert.ToSingle(elementsInBrick[2]);
+            newBlock.mainLayer = Convert.ToInt32(elementsInBrick[3]);
+            _listOfBlocks.Add(newBlock);
         }
 
     }
 
-    public void LoadOnScreen()
+    private void LoadOnScreen()
     {
 
-        chunkObject = MonoBehaviour.Instantiate((GameObject)Resources.Load("Empty"), parentOfChunk.transform);
-        chunkObject.name = CoordOfTheChunk.x + "," + CoordOfTheChunk.y;
+        _chunkObject = Object.Instantiate((GameObject)Resources.Load("Empty"), _parentOfChunk.transform);
+        _chunkObject.name = _coordsOfTheChunk.x + "," + _coordsOfTheChunk.y;
 
-        GameObject newGameObject;
-        for (int i = 0; i < listOfBlocks.Count; i++)
+        for (int i = 0; i < _listOfBlocks.Count; i++)
         {
-            newGameObject = MonoBehaviour.Instantiate((GameObject)Resources.Load("BlocksPrefabs/" + Convert.ToString(listOfBlocks[i].blockIndex)), chunkObject.transform);
-            newGameObject.name = "[" + listOfBlocks[i].blockIndex + ";" + listOfBlocks[i].x + ";" + listOfBlocks[i].y + ";" + listOfBlocks[i].mainLayer + "]";
-            newGameObject.transform.position = new Vector3(listOfBlocks[i].x * 0.5f, listOfBlocks[i].y * 0.5f, listOfBlocks[i].mainLayer * 0.5f);
-            if (listOfBlocks[i].mainLayer == 0)
+            var newGameObject = Object.Instantiate((GameObject)Resources.Load("BlocksPrefabs/" + Convert.ToString(_listOfBlocks[i].blockIndex)), _chunkObject.transform);
+            newGameObject.name = "[" + _listOfBlocks[i].blockIndex + ";" + _listOfBlocks[i].x + ";" + _listOfBlocks[i].y + ";" + _listOfBlocks[i].mainLayer + "]";
+            newGameObject.transform.position = new Vector3(_listOfBlocks[i].x * 0.5f, _listOfBlocks[i].y * 0.5f, _listOfBlocks[i].mainLayer * 0.5f);
+            if (_listOfBlocks[i].mainLayer == 0)
                 newGameObject.AddComponent<BoxCollider2D>();
         }
     }
 
-    public void Load(GameObject POM)
+    public void Load(GameObject pom)
     {
-        parentOfChunk = POM;
+        _parentOfChunk = pom;
         LoadInMemory();
         LoadOnScreen();
     }

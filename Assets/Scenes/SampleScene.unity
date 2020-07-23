@@ -301,17 +301,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3613d0acb904d6f46978820f76fc7f69, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hforce: 3
-  vforce: 6
+  hForce: 3
+  vForce: 6
   camSpeed: 0.1
   shiftBoost: 1.5
   vBoost: 0.001
   minYValue: -1
   isGrounded: 0
   vShift: 0
-  Cam: {fileID: 519420031}
-  SpawnPoint: {fileID: 4692176729277868, guid: 5e5bb9f77ae9b3c4883993066705772a, type: 3}
-  LayerSolidGroundMask:
+  cam: {fileID: 519420031}
+  spawnPoint: {fileID: 4692176729277868, guid: 5e5bb9f77ae9b3c4883993066705772a, type: 3}
+  layerSolidGroundMask:
     serializedVersion: 2
     m_Bits: 256
 --- !u!1 &45326748
